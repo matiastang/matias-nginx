@@ -2,7 +2,7 @@
  * @Author: tangdaoyong
  * @Date: 2021-01-21 17:58:44
  * @LastEditors: tangdaoyong
- * @LastEditTime: 2021-01-21 18:08:37
+ * @LastEditTime: 2021-01-22 10:04:38
  * @Description: config
 -->
 # config
@@ -11,7 +11,7 @@
 [config总结](http://www.ha97.com/5194.html)
 [config 分文件](https://www.cnblogs.com/djwhome/p/9346218.html)
 ```conf
-#运行用户
+#运行用户(在 group 省略的情况下，group 默认等于 user 名)
 user nobody;
 #启动进程,通常设置成和cpu的数量相等
 worker_processes  1;
@@ -135,3 +135,22 @@ http {
     }
 }
 ```
+
+## 错误
+
+## nginx: [emerg] getgrnam("nobody") failed in /etc/nginx/nginx.conf:2
+
+[Nginx user `getgrnam("nobody")`](https://github.com/Entware/Entware-ng/issues/870)
+[Nginx user 配置](https://www.sunzhongwei.com/nginx-user-conf-and-endless-loop.html)
+
+getgrnam是“获取组名”的缩写。简而言之，该错误表明组名“ nobody”不存在。
+您可以看一下：，
+$ cat /etc/group
+然后看到没有以“ nobody:x:”开头的行。这就是为什么发生此错误的原因。
+当/ etc / group列出以“ nogroup:x:”开头的行时，您可能希望使用该组来启动nginx。
+通过以下方法编辑nginx配置，
+$ nano /opt/etc/nginx/nginx.conf
+并更改行：
+user  nobody;
+至：
+user  nobody nogroup;
